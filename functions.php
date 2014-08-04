@@ -10,6 +10,7 @@
      
      
     // create new user account (if doesn't already exist)  upon event registration completion
+    // code taken from https://gist.github.com/sidharrell/7455060#file-espresso_create_wp_user-php
     add_action('action_hook_espresso_save_attendee_data','espresso_create_wp_user', 10, 1);
     function espresso_create_wp_user($attendee_data) {
         if( username_exists( $attendee_data['email'] ) == NULL ) {
