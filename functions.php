@@ -1,7 +1,7 @@
-// place these in functions.php	
+// place these in functions.php
 
 
-    //  redirect all non-admins to home page
+    // redirect all non-admins to home page
     function soi_login_redirect($redirect_to, $request, $user)
     {
         return (is_array($user->roles) && in_array('administrator', $user->roles)) ? admin_url() : site_url();
@@ -9,11 +9,12 @@
     add_filter('login_redirect', 'soi_login_redirect', 10, 3);
      
      
-    // create new user account (if doesn't already exist)  upon event registration completion
-    // code taken from https://gist.github.com/sidharrell/7455060#file-espresso_create_wp_user-php
+    // create new user account (if doesn't already exist) upon event registration completion
+    // code taken from https://gist.github.com/sidharrell/7455060#file-espresso_create_wp_user-php	
+    // also taken from http://wordpress.stackexchange.com/questions/4725/how-to-change-a-users-role
     add_action('action_hook_espresso_save_attendee_data','espresso_create_wp_user', 10, 1);
     function espresso_create_wp_user($attendee_data) {
-        if( username_exists( $attendee_data['email'] ) == NULL ) {
+        if( email_exists( $attendee_data['email'] ) == false ) {
                     global $org_options;   
                    
                     // Generate the password and create the user
@@ -48,7 +49,11 @@
                     // Email the user
                     wp_mail( $attendee_data['email'], 'Welcome to ' . $org_options['organization'], 'Your Username: ' .$attendee_data['email']. ' Your Password: ' . $password );
            
-            } // end if
+            } else {
+                    $user = get_user_by( 'email', $attendee_data['email'] );
+                    $user->remove_role( 'subscriber' );
+                    $user->add_role( 'abstract' );
+            }// end if
     }
 
 
